@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Connexion en cours...</title>
+  <title>Connexion...</title>
   <script>
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
@@ -18,16 +18,11 @@
           username: user.username || user.global_name
         }, '*');
         document.body.innerHTML = '<h2 style="color:#7289da; font-family:Arial; text-align:center; padding:50px;">Connexion réussie ! Fermez cette page.</h2>';
-      })
-      .catch(() => {
-        document.body.innerHTML = '<h2 style="color:red;">Erreur de connexion.</h2>';
       });
-    } else {
-      document.body.innerHTML = '<h2 style="color:red;">Aucun token reçu.</h2>';
     }
   </script>
 </head>
-<body style="background:#2C2F33; margin:0; font-family:Arial;">
-  <h2 style="color:white; text-align:center; padding:50px;">Connexion en cours...</h2>
+<body style="background:#2C2F33; margin:0;">
+  <h2 style="color:white; font-family:Arial; text-align:center; padding:50px;">Connexion en cours...</h2>
 </body>
 </html>
