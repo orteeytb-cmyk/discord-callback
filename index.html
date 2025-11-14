@@ -1,34 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Connexion...</title>
-  <script>
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const token = params.get('access_token');
+// === BOUTON DISCORD ===
+let authWindow = null;
 
-    if (token && window.opener) {
-      fetch('https://discord.com/api/users/@me', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res => res.json())
-      .then(user => {
-        window.opener.postMessage({
-          type: 'DISCORD_AUTH',
-          username: user.username || user.global_name
-        }, '*');
-        document.body.innerHTML = '<h2 style="color:#7289da; font-family:Arial; text-align:center; padding:50px;">Connexion réussie ! Vous pouvez fermer cette fenêtre.</h2>';
-      })
-      .catch(err => {
-        console.error(err);
-        document.body.innerHTML = '<h2 style="color:red;">Erreur de connexion.</h2>';
-      });
-    } else {
-      document.body.innerHTML = '<h2 style="color:red;">Aucun token ou popup bloquée.</h2>';
-    }
-  </script>
-</head>
-<body style="background:#2C2F33; margin:0;">
-  <h2 style="color:white; font-family:Arial; text-align:center; padding:50px;">Connexion en cours...</h2>
-</body>
-</html>
+document.getElementById('discord-btn').onclick = () => {
+  if (window.electronAPI && window.electronAPI.openDiscordAuth) {
+    window.electronAPI.openDiscordAuth();
+  }
+
+  const btn = document.getElementById('discord-btn');
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Connexion...</span>';
+  btn.disabled = true;
+};
+
+// === RÉCEPTION DU SUCCÈS ===
+ipcRenderer.on('discord-login-success', (event, user) => {
+  connectUser(user.username);
+  resetDiscordButton();
+});
+
+ipcRenderer.on('discord-login-error', () => {
+  alert('Erreur de connexion Discord');
+  resetDiscordButton();
+});
+
+ipcRenderer.on('discord-auth-closed', () => {
+  resetDiscordButton();
+});
+
+function resetDiscordButton() {
+  const btn = document.getElementById('discord-btn');
+  btn.innerHTML = '<i class="fa-brands fa-discord"></i><span>Login with Discord</span>';
+  btn.disabled = false;
+}
+
+// === CONNEXION ===
+function connectUser(name) {
+  document.getElementById('username').textContent = name;
+
+  loginPanel.classList.remove('show');
+  setTimeout(() => {
+    loginPanel.classList.add('hidden');
+    homePanel.classList.remove('hidden');
+    setTimeout(() => homePanel.classList.add('show'), 100);
+  }, 600);
+}
