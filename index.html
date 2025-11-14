@@ -7,41 +7,31 @@
 <body>
   <h3>Connexion en cours...</h3>
   <script>
-    // Récupère le token depuis l'URL
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
     const token = params.get('access_token');
 
     if (!token) {
-      document.body.innerHTML = "<h3 style='color:red'>Échec de l'authentification.</h3>";
+      document.body.innerHTML = "<h3 style='color:red'>Échec.</h3>";
       setTimeout(() => window.close(), 2000);
       return;
     }
 
-    // Récupère les infos utilisateur
     fetch('https://discord.com/api/users/@me', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Token invalide ou expiré');
-      return res.json();
-    })
+    .then(res => res.ok ? res.json() : Promise.reject())
     .then(user => {
-      // Envoie les données au launcher
       window.opener.postMessage({
         type: 'DISCORD_AUTH',
         username: user.username,
-        id: user.id,
-        avatar: user.avatar,
-        discriminator: user.discriminator || '0000'
-      }, 'http://localhost:3000'); // CHANGE SI TU UTILISE UN AUTRE PORT
-
-      document.body.innerHTML = "<h3 style='color:green'>Connexion réussie ! Fermeture...</h3>";
+        id: user.id
+      }, '*');
+      document.body.innerHTML = "<h3 style='color:green'>OK !</h3>";
       setTimeout(() => window.close(), 1000);
     })
-    .catch(err => {
-      console.error(err);
-      document.body.innerHTML = `<h3 style='color:red'>Erreur: ${err.message}</h3>`;
+    .catch(() => {
+      document.body.innerHTML = "<h3 style='color:red'>Erreur token.</h3>";
       setTimeout(() => window.close(), 3000);
     });
   </script>
