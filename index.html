@@ -25,7 +25,8 @@
       })
       .then(res => res.json())
       .then(user => {
-        const username = user.global_name || user.username || 'Inconnu';
+        // ON ENVOIE UNIQUEMENT LE NOM D'UTILISATEUR (username)
+        const username = user.username || 'Inconnu';
         window.opener.postMessage({
           type: 'DISCORD_AUTH',
           username: username
