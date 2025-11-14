@@ -13,18 +13,19 @@
     })
     .then(res => res.json())
     .then(user => {
+      const avatar = user.avatar 
+        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+        : null;
+
       window.opener.postMessage({
         type: 'DISCORD_AUTH',
         username: user.username,
         id: user.id,
         avatar: user.avatar
-      }, '*');
+      }, 'https://orteeytb-cmyk.github.io'); // Change si ton domaine change
 
       window.close();
-    })
-    .catch(() => window.close());
-  } else {
-    window.close();
+    });
   }
 </script>
 </body>
