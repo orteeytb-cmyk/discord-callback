@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html>
-<head><title>Discord Auth</title></head>
-<body>
-<script>
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
-  const token = params.get('access_token');
+<head>
+  <title>Connexion...</title>
+  <script>
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const token = params.get('access_token');
 
-  if (token) {
-    fetch('https://discord.com/api/users/@me', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => res.json())
-    .then(user => {
-      const avatar = user.avatar 
-        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-        : null;
-
-      window.opener.postMessage({
-        type: 'DISCORD_AUTH',
-        username: user.username,
-        id: user.id,
-        avatar: user.avatar
-      }, 'https://orteeytb-cmyk.github.io'); // Change si ton domaine change
-
-      window.close();
-    });
-  }
-</script>
+    if (token && window.opener) {
+      fetch('https://discord.com/api/users/@me', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(user => {
+        window.opener.postMessage({
+          type: 'DISCORD_AUTH',
+          username: user.username || user.global_name
+        }, '*');
+        document.body.innerHTML = '<h2 style="color:#7289da; font-family:Arial; text-align:center; padding:50px;">Connexion réussie ! Vous pouvez fermer cette fenêtre.</h2>';
+      })
+      .catch(err => {
+        console.error(err);
+        document.body.innerHTML = '<h2 style="color:red;">Erreur de connexion.</h2>';
+      });
+    } else {
+      document.body.innerHTML = '<h2 style="color:red;">Aucun token ou popup bloquée.</h2>';
+    }
+  </script>
+</head>
+<body style="background:#2C2F33; margin:0;">
+  <h2 style="color:white; font-family:Arial; text-align:center; padding:50px;">Connexion en cours...</h2>
 </body>
 </html>
