@@ -25,11 +25,11 @@
       })
       .then(res => res.json())
       .then(user => {
-        // ON ENVOIE UNIQUEMENT LE VRAI USERNAME
-        const realUsername = user.username || 'Inconnu';
         window.opener.postMessage({
           type: 'DISCORD_AUTH',
-          username: realUsername
+          username: user.username || 'Inconnu',
+          id: user.id,
+          avatar: user.avatar
         }, '*');
         window.close();
       })
@@ -41,7 +41,7 @@
         window.close();
       });
     } else {
-      document.body.innerHTML = '<h2>Erreur : Token manquant ou popup bloquée</h2>';
+      document.body.innerHTML = '<h2>Erreur : Token manquant</h2>';
     }
   </script>
 </body>
