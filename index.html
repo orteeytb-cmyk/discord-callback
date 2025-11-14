@@ -1,39 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Discord Auth</title>
-</head>
+<head><title>Discord Auth</title></head>
 <body>
-  <h3>Connexion en cours...</h3>
-  <script>
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const token = params.get('access_token');
+<script>
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get('access_token');
 
-    if (!token) {
-      document.body.innerHTML = "<h3 style='color:red'>Échec.</h3>";
-      setTimeout(() => window.close(), 2000);
-      return;
-    }
-
+  if (token) {
     fetch('https://discord.com/api/users/@me', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` }
     })
-    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(res => res.json())
     .then(user => {
       window.opener.postMessage({
         type: 'DISCORD_AUTH',
         username: user.username,
-        id: user.id
+        id: user.id,
+        avatar: user.avatar
       }, '*');
-      document.body.innerHTML = "<h3 style='color:green'>OK !</h3>";
-      setTimeout(() => window.close(), 1000);
+
+      window.close();
     })
-    .catch(() => {
-      document.body.innerHTML = "<h3 style='color:red'>Erreur token.</h3>";
-      setTimeout(() => window.close(), 3000);
-    });
-  </script>
+    .catch(() => window.close());
+  } else {
+    window.close();
+  }
+</script>
 </body>
 </html>
