@@ -25,29 +25,22 @@
       })
       .then(res => res.json())
       .then(user => {
+        const username = user.global_name || user.username || 'Inconnu';
         window.opener.postMessage({
           type: 'DISCORD_AUTH',
-          username: user.username || user.global_name,
-          id: user.id,
-          avatar: user.avatar
+          username: username
         }, '*');
-        // MESSAGE SÛR SANS NULL
-        const msg = document.createElement('h2');
-        msg.style.color = '#7289da';
-        msg.textContent = 'Connexion réussie ! Fermez cette fenêtre.';
-        document.body.appendChild(msg);
+        window.close();
       })
       .catch(() => {
-        const err = document.createElement('h2');
-        err.style.color = 'red';
-        err.textContent = 'Erreur de connexion.';
-        document.body.appendChild(err);
+        window.opener.postMessage({
+          type: 'DISCORD_AUTH',
+          username: 'Erreur'
+        }, '*');
+        window.close();
       });
     } else {
-      const err = document.createElement('h2');
-      err.style.color = 'red';
-      err.textContent = 'Aucun token ou popup bloquée.';
-      document.body.appendChild(err);
+      document.body.innerHTML = '<h2>Erreur : Popup bloquée ou token manquant</h2>';
     }
   </script>
 </body>
