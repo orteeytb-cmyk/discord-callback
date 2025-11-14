@@ -1,45 +1,35 @@
-// === BOUTON DISCORD ===
-let authWindow = null;
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion en cours...</title>
+  <style>
+    body { background: #2c2f33; color: #fff; font-family: sans-serif; text-align: center; padding: 50px; }
+    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #5865F2; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h2>Connexion à BLIXT...</h2>
+  <div class="spinner"></div>
+  <p>Ne fermez pas cette fenêtre.</p>
 
-document.getElementById('discord-btn').onclick = () => {
-  if (window.electronAPI && window.electronAPI.openDiscordAuth) {
-    window.electronAPI.openDiscordAuth();
-  }
+  <script>
+    // Récupère le token depuis l'URL
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const token = params.get('access_token');
 
-  const btn = document.getElementById('discord-btn');
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Connexion...</span>';
-  btn.disabled = true;
-};
-
-// === RÉCEPTION DU SUCCÈS ===
-ipcRenderer.on('discord-login-success', (event, user) => {
-  connectUser(user.username);
-  resetDiscordButton();
-});
-
-ipcRenderer.on('discord-login-error', () => {
-  alert('Erreur de connexion Discord');
-  resetDiscordButton();
-});
-
-ipcRenderer.on('discord-auth-closed', () => {
-  resetDiscordButton();
-});
-
-function resetDiscordButton() {
-  const btn = document.getElementById('discord-btn');
-  btn.innerHTML = '<i class="fa-brands fa-discord"></i><span>Login with Discord</span>';
-  btn.disabled = false;
-}
-
-// === CONNEXION ===
-function connectUser(name) {
-  document.getElementById('username').textContent = name;
-
-  loginPanel.classList.remove('show');
-  setTimeout(() => {
-    loginPanel.classList.add('hidden');
-    homePanel.classList.remove('hidden');
-    setTimeout(() => homePanel.classList.add('show'), 100);
-  }, 600);
-}
+    if (token && window.opener) {
+      // Envoie les données au launcher
+      window.opener.postMessage({
+        type: 'DISCORD_AUTH',
+        token: token
+      }, '*');
+      window.close();
+    } else {
+      document.body.innerHTML = '<h2>Erreur : Token manquant</h2>';
+    }
+  </script>
+</body>
+</html>
